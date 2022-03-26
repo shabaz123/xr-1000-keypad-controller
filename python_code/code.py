@@ -145,7 +145,13 @@ def command_send_uart(a, p, s=""):
 def program_send():
     for i, c in enumerate(command):
         print(f"line {i}: '{c}'")
-        command_send_uart(-1, "", c)
+        if "rpt" in c:
+            tok = c.split()  # [0]=rpt, [1]=secpos, [2]=timesparam
+            for lp in range(0, int(tok[2])):
+                for j in range(int(tok[1]), i):
+                    command_send_uart(-1, "", command[j])
+        else:
+            command_send_uart(-1, "", c)
 
 
 # main program
@@ -207,6 +213,8 @@ def main():
                             command.append("rpt " + str(secpos) + " " + param)
                             section = 0
                             secpos = 0
+                            param = ""
+                            action = 0
                         elif param == "" or action == 0:
                             asource.file = open("needinp.mp3", "rb")
                             i2s.play(asource)  # play the audio source
